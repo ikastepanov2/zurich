@@ -1,0 +1,23 @@
+{
+  "name": "zyrich",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "headless": "npx playwright test",
+    "showReport": "npx playwright show-report",
+    "openUI": "npx playwright test --ui",
+    "chrome": "npx playwright test --headed",
+    "test": "playwright test",
+    "debug:ui": "playwright test tests/ui --ui",
+    "debug:api": "playwright test tests/api --ui",
+    "codegen": "playwright codegen https://opensource-demo.orangehrmlive.com/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.53.1",
+    "@types/node": "^24.0.7"
+  }
+}
