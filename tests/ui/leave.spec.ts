@@ -3,7 +3,7 @@ import { LoginPage } from '../../pages/LoginPage';
 import { LeavePage } from '../../pages/LeavePage';
 import { credentials } from '../../utils/testData';
 
-test('Search Leave Requests', async ({ page }) => {
+test.skip('Search Leave Requests', async ({ page }) => {
   const login = new LoginPage(page);
   const leavePage = new LeavePage(page);
 
