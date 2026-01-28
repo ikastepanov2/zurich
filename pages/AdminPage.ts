@@ -2,7 +2,7 @@ import { expect, Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class AdminPage extends BasePage{
-  // readonly page: Page;
+
   readonly AddUserTitle: Locator;
   readonly Drodown: Locator;
   readonly AdminUserRoleItem: Locator;
@@ -10,6 +10,10 @@ export class AdminPage extends BasePage{
   readonly DropdownInputItem: Locator;
   readonly inputFileds: Locator;
   readonly confirmDeleteOption: Locator;
+  readonly UserNameSearchFiled: Locator;
+  readonly EmployeeInputField: Locator;
+  readonly DropdownListbox: Locator;
+  readonly FirstDropdownItem: Locator;
 
 
   constructor(page: Page) {
@@ -21,6 +25,10 @@ export class AdminPage extends BasePage{
     this.DropdownInputItem = page.locator('div.oxd-select-text-input');
     this.inputFileds = page.locator('form input');
     this.confirmDeleteOption = page.locator('button:has-text("Yes, Delete")');
+    this.UserNameSearchFiled = page.locator('.oxd-input.oxd-input--active').last();
+    this.EmployeeInputField = this.page.locator('input[placeholder="Type for hints..."]');
+    this.DropdownListbox = this.page.locator('div[role="listbox"]');
+    this.FirstDropdownItem = this.DropdownListbox.locator('div[role="option"]').first();
   }
 
   async navigateToSystemUsers() {
@@ -53,48 +61,49 @@ export class AdminPage extends BasePage{
 
     await this.chooseEmployeeName('R');
     await this.SaveBtn.click();
-    await this.loadingSpinner.waitFor({state: "hidden"});
+    await this.LoadingSpinner.waitFor({state: "hidden"});
     return username;
   }
 
   async searchUser(username: string) {
-    await this.page.locator('.oxd-input.oxd-input--active').last().fill(username);
-    await this.page.click('button:has-text("Search")');
-    await this.loadingSpinner.waitFor({state:"hidden"});
-    await this.page.waitForSelector(`div:has-text("${username}")`, {state:"visible"});
+    await this.UserNameSearchFiled.fill(username);
+    await this.SearchButton.click();
+    await this.LoadingSpinner.waitFor({state:"hidden"});
+    await this.page.waitForTimeout(1000);
   }
 
   async editUser(username: string, newUsername: string) {
     await this.searchUser(username);
-    await this.editBtn.waitFor({state:"visible"});
-    await this.editBtn.click();
-    await this.loadingSpinner.waitFor({state:"hidden"});
+    await this.EditBtn.waitFor({state:"visible"});
+    await this.EditBtn.click();
+    await this.LoadingSpinner.waitFor({state:"hidden"});
     await this.page.waitForTimeout(3000);
     await this.inputFileds.nth(1).fill(newUsername);
     await this.SaveBtn.click();
-    await this.loadingSpinner.waitFor({ state: 'hidden' });
+    await this.LoadingSpinner.waitFor({ state: 'hidden' });
   }
 
   async deleteUser(username: string) {
     await this.page.waitForTimeout(3000);
     await this.searchUser(username);
-    await this.deleteBtn.waitFor({state:"visible"});
-    await this.deleteBtn.click();
+    await this.DeleteBtn.waitFor({state:"visible"});
+    await this.DeleteBtn.click();
     await this.confirmDeleteOption.click();
   }
 
   async chooseEmployeeName(value: string) {
     // Click into the Employee Name input field
-    const employeeInput = this.page.locator('input[placeholder="Type for hints..."]');
-    await employeeInput.click();
+    await this.EmployeeInputField.click();
 
     // Type any starting character to trigger suggestions
-    await employeeInput.fill(value);
+    await this.EmployeeInputField.fill(value);
     await this.page.waitForTimeout(3000);
-    const dropdownListbox = this.page.locator('div[role="listbox"]');
-    await dropdownListbox.waitFor(); // Wait until list items are displayed
-    const firstSuggestion = dropdownListbox.locator('div[role="option"]').first();
-    await firstSuggestion.click();
+    await this.DropdownListbox.waitFor(); // Wait until list items are displayed
+    await this.FirstDropdownItem.click();
 
+  }
+
+    async isUserPresent(username: string): Promise<boolean> {
+    return await this.userRow(username).first().isVisible();
   }
 }

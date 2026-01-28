@@ -3,18 +3,18 @@ import { BasePage } from './BasePage';
 
 export class EmployeePage extends BasePage {
 
-  readonly firstNameFiled: Locator;
-  readonly middleNameField: Locator;
-  readonly lastNameField: Locator;
-  readonly employeeIdField: Locator;
+  readonly FirstNameFiled: Locator;
+  readonly MiddleNameField: Locator;
+  readonly LastNameField: Locator;
+  readonly SearchEmployeeIdField: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.firstNameFiled = page.locator('input[name="firstName"]');
-    this.middleNameField = page.locator('input[name="middleName"]');
-    this.lastNameField = page.locator('input[name="lastName"]');
-    this.employeeIdField = page.locator('input[name="firstName"]');
-    this.firstNameFiled = page.locator('input[name="firstName"]');
+    this.FirstNameFiled = page.locator('input[name="firstName"]');
+    this.MiddleNameField = page.locator('input[name="middleName"]');
+    this.LastNameField = page.locator('input[name="lastName"]');
+    this.SearchEmployeeIdField = page.locator('form>div>div>div>div>div>.oxd-input.oxd-input--active');
+    this.FirstNameFiled = page.locator('input[name="firstName"]');
   }
 
   async navigateToPIM() {
@@ -24,12 +24,12 @@ export class EmployeePage extends BasePage {
 
   async addEmployee(firstName: string, middleName: string, lastName: string, employeeId: string) {
     await this.AddBtn.click();
-    await this.firstNameFiled.fill(firstName);
-    await this.middleNameField.fill(middleName)
-    await this.lastNameField.fill(lastName);
-    await this.employeeIdField.fill(employeeId);
+    await this.FirstNameFiled.fill(firstName);
+    await this.MiddleNameField.fill(middleName)
+    await this.LastNameField.fill(lastName);
+    // await this.SearchEmployeeIdField.fill(employeeId);
     await this.SaveBtn.click();
-    await this.loadingSpinner.waitFor({ state: "hidden" });
+    await this.LoadingSpinner.waitFor({ state: "hidden" });
   }
 
   async deleteEmployee(updatedFirstName: any) {
@@ -37,20 +37,26 @@ export class EmployeePage extends BasePage {
   }
   async editEmployee(employeeId: string, updatedEmployeeId: string) {
     await this.searchEmployee(employeeId);
-    await this.editBtn.waitFor({ state: "visible" });
-    await this.editBtn.click();
-    await this.loadingSpinner.waitFor({ state: "hidden" });
+    await this.EditBtn.waitFor({ state: "visible" });
+    await this.EditBtn.click();
+    await this.LoadingSpinner.waitFor({ state: "hidden" });
     await this.page.waitForTimeout(3000);
-    await this.employeeIdField.fill(updatedEmployeeId);
+    await this.SearchEmployeeIdField.fill(updatedEmployeeId);
     await this.SaveBtn.click();
-    await this.loadingSpinner.waitFor({ state: 'hidden' });
+    await this.LoadingSpinner.waitFor({ state: 'hidden' });
   }
   async searchEmployee(employeeId: string) {
     this.navigateToPIM();
-    await this.loadingSpinner.waitFor({ state: "hidden" });
-    await this.page.locator('form>div>div>div>div>div>.oxd-input.oxd-input--active').fill(employeeId);
-    await this.page.click('button:has-text("Search")');
-    await this.loadingSpinner.waitFor({ state: "hidden" });
-    await this.page.waitForSelector(`div:has-text("${employeeId}")`, { state: "visible" });
+    await this.LoadingSpinner.waitFor({ state: "hidden" });
+    // await this..fill(employeeId);
+    await this.SearchEmployeeIdField.waitFor({ state: "attached" })
+    await this.SearchEmployeeIdField.fill(employeeId);
+    await this.SearchButton.click();
+    await this.LoadingSpinner.waitFor({ state: "hidden" });
+    await this.page.waitForTimeout(1000);
+  }
+
+  async isEmployeePresent(username: string): Promise<boolean> {
+    return await this.userRow(username).first().isVisible();
   }
 }
